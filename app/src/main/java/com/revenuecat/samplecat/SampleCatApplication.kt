@@ -5,6 +5,7 @@ import com.revenuecat.purchases.LogLevel
 import com.revenuecat.purchases.Purchases
 import com.revenuecat.purchases.PurchasesConfiguration
 import com.revenuecat.samplecat.config.Constants
+import com.revenuecat.samplecat.BuildConfig
 
 /**
  * Application class that initializes the RevenueCat SDK.
