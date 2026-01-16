@@ -41,7 +41,7 @@ val entitlementId: String = project.findProperty("REVENUECAT_ENTITLEMENT_ID") as
 val applicationIdProperty: String = project.findProperty("APPLICATION_ID") as? String ?: "com.revenuecat.samplecat"
 
 android {
-    namespace = applicationIdProperty
+    namespace = "com.revenuecat.samplecat"
     compileSdk = 35
 
     defaultConfig {
