@@ -7,16 +7,19 @@ import com.revenuecat.purchases.CustomerInfo
 import com.revenuecat.purchases.Offering
 import com.revenuecat.purchases.Offerings
 import com.revenuecat.purchases.Package
+import com.revenuecat.purchases.PurchaseParams
 import com.revenuecat.purchases.Purchases
+import com.revenuecat.purchases.PurchasesErrorCode
 import com.revenuecat.purchases.PurchasesException
+import com.revenuecat.purchases.awaitCustomerInfo
 import com.revenuecat.purchases.awaitOfferings
 import com.revenuecat.purchases.awaitPurchase
+import com.revenuecat.purchases.interfaces.UpdatedCustomerInfoListener
 import com.revenuecat.purchases.models.StoreProduct
 import com.revenuecat.samplecat.config.Constants
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 /**
@@ -48,14 +51,31 @@ class UserViewModel : ViewModel() {
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error.asStateFlow()
 
+    private val customerInfoListener = UpdatedCustomerInfoListener { customerInfo ->
+        _customerInfo.value = customerInfo
+        updateSubscriptionStatus(customerInfo)
+    }
+
     init {
-        // Listen to CustomerInfo updates from RevenueCat
+        // Register listener for CustomerInfo updates
+        Purchases.sharedInstance.updatedCustomerInfoListener = customerInfoListener
+
+        // Fetch initial customer info
         viewModelScope.launch {
-            Purchases.sharedInstance.updatedCustomerInfoFlow.collect { newCustomerInfo ->
-                _customerInfo.value = newCustomerInfo
-                updateSubscriptionStatus(newCustomerInfo)
+            try {
+                val info = Purchases.sharedInstance.awaitCustomerInfo()
+                _customerInfo.value = info
+                updateSubscriptionStatus(info)
+            } catch (e: PurchasesException) {
+                // Initial fetch failed, will be updated via listener
             }
         }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        // Clean up listener when ViewModel is destroyed
+        Purchases.sharedInstance.updatedCustomerInfoListener = null
     }
 
     private fun updateSubscriptionStatus(customerInfo: CustomerInfo?) {
@@ -97,12 +117,13 @@ class UserViewModel : ViewModel() {
             _error.value = null
 
             try {
-                val (_, customerInfo) = Purchases.sharedInstance.awaitPurchase(activity, packageToPurchase)
-                _customerInfo.value = customerInfo
-                updateSubscriptionStatus(customerInfo)
+                val purchaseParams = PurchaseParams.Builder(activity, packageToPurchase).build()
+                val result = Purchases.sharedInstance.awaitPurchase(purchaseParams)
+                _customerInfo.value = result.customerInfo
+                updateSubscriptionStatus(result.customerInfo)
             } catch (e: PurchasesException) {
                 // User cancelled is not an error
-                if (!e.userCancelled) {
+                if (e.error.code != PurchasesErrorCode.PurchaseCancelledError) {
                     _error.value = "Purchase failed: ${e.message}"
                 }
             } finally {
@@ -127,12 +148,13 @@ class UserViewModel : ViewModel() {
             _error.value = null
 
             try {
-                val (_, customerInfo) = Purchases.sharedInstance.awaitPurchase(activity, product)
-                _customerInfo.value = customerInfo
-                updateSubscriptionStatus(customerInfo)
+                val purchaseParams = PurchaseParams.Builder(activity, product).build()
+                val result = Purchases.sharedInstance.awaitPurchase(purchaseParams)
+                _customerInfo.value = result.customerInfo
+                updateSubscriptionStatus(result.customerInfo)
             } catch (e: PurchasesException) {
                 // User cancelled is not an error
-                if (!e.userCancelled) {
+                if (e.error.code != PurchasesErrorCode.PurchaseCancelledError) {
                     _error.value = "Purchase failed: ${e.message}"
                 }
             } finally {
