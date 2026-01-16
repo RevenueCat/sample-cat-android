@@ -1,6 +1,7 @@
 package com.revenuecat.samplecat.viewmodel
 
 import android.app.Activity
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.revenuecat.purchases.CustomerInfo
@@ -91,15 +92,31 @@ class UserViewModel : ViewModel() {
             _isFetchingOfferings.value = true
             _error.value = null
 
+            Log.d(TAG, "Fetching offerings...")
+
             try {
                 val fetchedOfferings = Purchases.sharedInstance.awaitOfferings()
                 _offerings.value = fetchedOfferings
+
+                Log.d(TAG, "Fetched offerings: ${fetchedOfferings.all.size} offerings")
+                fetchedOfferings.all.forEach { (id, offering) ->
+                    Log.d(TAG, "  Offering: $id with ${offering.availablePackages.size} packages")
+                }
+
+                if (fetchedOfferings.all.isEmpty()) {
+                    Log.w(TAG, "No offerings returned from RevenueCat. Check your dashboard configuration.")
+                }
             } catch (e: PurchasesException) {
+                Log.e(TAG, "Failed to fetch offerings: ${e.message}", e)
                 _error.value = "Failed to fetch offerings: ${e.message}"
             } finally {
                 _isFetchingOfferings.value = false
             }
         }
+    }
+
+    companion object {
+        private const val TAG = "UserViewModel"
     }
 
     /**
