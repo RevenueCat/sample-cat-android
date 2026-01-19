@@ -16,5 +16,5 @@ object Constants {
      * The entitlement identifier from the RevenueCat dashboard that is activated
      * upon successful in-app purchase for the duration of the purchase.
      */
-    val entitlementId: String? = BuildConfig.ENTITLEMENT_ID.takeIf { it.isNotBlank() }
+    val entitlementId: String? = BuildConfig.ENTITLEMENT_ID?.takeIf { it.isNotBlank() }
 }

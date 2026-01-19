@@ -6,7 +6,8 @@ plugins {
     alias(libs.plugins.kotlin.compose)
 }
 
-val revenueCatApiKey: String = project.findProperty("REVENUECAT_API_KEY") as? String
+val revenueCatApiKey: String = (project.findProperty("REVENUECAT_API_KEY") as? String)
+    ?.takeIf { it.isNotBlank() && it != "must-inject" }
     ?: throw GradleException(
         """
         |
@@ -14,7 +15,7 @@ val revenueCatApiKey: String = project.findProperty("REVENUECAT_API_KEY") as? St
         |
         |To configure the API key:
         |1. Open gradle.properties in the project root
-        |2. Replace 'must-inject' with your RevenueCat Google Play API key:
+        |2. Set your RevenueCat Google Play API key:
         |   REVENUECAT_API_KEY=goog_xxx
         |
         |Get your API key from: https://app.revenuecat.com
@@ -22,25 +23,39 @@ val revenueCatApiKey: String = project.findProperty("REVENUECAT_API_KEY") as? St
         """.trimMargin()
     )
 
-if (revenueCatApiKey == "must-inject") {
-    throw GradleException(
+val entitlementId: String? = (project.findProperty("REVENUECAT_ENTITLEMENT_ID") as? String)
+    ?.takeIf { it.isNotBlank() }
+    .also { if (it == null) logger.warn(
         """
         |
-        |RevenueCat API key not configured!
+        |WARNING: REVENUECAT_ENTITLEMENT_ID is not configured.
         |
-        |To configure the API key:
+        |To configure the entitlement ID:
         |1. Open gradle.properties in the project root
-        |2. Replace 'must-inject' with your RevenueCat Google Play API key:
-        |   REVENUECAT_API_KEY=goog_xxx
+        |2. Set your RevenueCat entitlement ID:
+        |   REVENUECAT_ENTITLEMENT_ID=your_entitlement_id
         |
-        |Get your API key from: https://app.revenuecat.com
+        |Get your entitlement ID from: https://app.revenuecat.com
+        |
+        """.trimMargin()
+    )}
+
+val applicationIdProperty: String = (project.findProperty("APPLICATION_ID") as? String)
+    ?.takeIf { it.isNotBlank() && it != "must-inject" }
+    ?: throw GradleException(
+        """
+        |
+        |Application ID not configured!
+        |
+        |To configure the application ID:
+        |1. Open gradle.properties in the project root
+        |2. Set your application ID (package name):
+        |   APPLICATION_ID=com.example.yourapp
+        |
+        |This must match the package name in Google Play Console.
         |
         """.trimMargin()
     )
-}
-
-val entitlementId: String = project.findProperty("REVENUECAT_ENTITLEMENT_ID") as? String ?: "premium_plus"
-val applicationIdProperty: String = project.findProperty("APPLICATION_ID") as? String ?: "com.revenuecat.samplecat"
 
 android {
     namespace = "com.revenuecat.samplecat"
@@ -54,7 +69,7 @@ android {
         versionName = "1.0"
 
         buildConfigField("String", "REVENUECAT_API_KEY", "\"$revenueCatApiKey\"")
-        buildConfigField("String", "ENTITLEMENT_ID", "\"$entitlementId\"")
+        buildConfigField("String", "ENTITLEMENT_ID", if (entitlementId != null) "\"$entitlementId\"" else "null")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
