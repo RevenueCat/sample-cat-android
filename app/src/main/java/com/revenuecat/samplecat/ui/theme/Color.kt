@@ -5,6 +5,7 @@ import androidx.compose.ui.graphics.Color
 // RevenueCat Brand Colors
 val RCBlue = Color(0xFF576CDB)
 val RCGreen = Color(0xFF11D483)
+val RCPurple = Color(0xFF1F1F47)
 val AccentColor = Color(0xFFF2545B)
 
 // Light Theme Colors

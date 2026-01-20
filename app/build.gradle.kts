@@ -114,6 +114,7 @@ dependencies {
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.revenuecat.purchases)
+    implementation(libs.revenuecat.purchases.ui)
 
     debugImplementation(libs.androidx.ui.tooling)
 }

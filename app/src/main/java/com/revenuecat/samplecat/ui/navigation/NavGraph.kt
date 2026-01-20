@@ -2,7 +2,9 @@ package com.revenuecat.samplecat.ui.navigation
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CreditCard
 import androidx.compose.material.icons.filled.Inventory2
+import androidx.compose.material.icons.filled.ManageAccounts
 import androidx.compose.material.icons.filled.Payments
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -21,8 +23,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.revenuecat.samplecat.ui.screens.customercenter.CustomerCenterScreen
 import com.revenuecat.samplecat.ui.screens.offerings.OfferingPackagesScreen
 import com.revenuecat.samplecat.ui.screens.offerings.OfferingsScreen
+import com.revenuecat.samplecat.ui.screens.paywalls.PaywallsScreen
 import com.revenuecat.samplecat.ui.screens.products.ProductsScreen
 import com.revenuecat.samplecat.viewmodel.UserViewModel
 
@@ -32,6 +36,8 @@ import com.revenuecat.samplecat.viewmodel.UserViewModel
 sealed class Screen(val route: String, val title: String, val icon: ImageVector?) {
     data object Offerings : Screen("offerings", "Offerings", Icons.Default.Payments)
     data object Products : Screen("products", "Products", Icons.Default.Inventory2)
+    data object Paywalls : Screen("paywalls", "Paywalls", Icons.Default.CreditCard)
+    data object CustomerCenter : Screen("customer_center", "Support", Icons.Default.ManageAccounts)
     data object OfferingPackages : Screen(
         route = "offering_packages/{offeringId}",
         title = "Packages",
@@ -41,7 +47,12 @@ sealed class Screen(val route: String, val title: String, val icon: ImageVector?
     }
 }
 
-private val bottomNavItems = listOf(Screen.Offerings, Screen.Products)
+private val bottomNavItems = listOf(
+    Screen.Offerings,
+    Screen.Products,
+    Screen.Paywalls,
+    Screen.CustomerCenter
+)
 
 @Composable
 fun SampleCatNavHost(
@@ -98,6 +109,14 @@ fun SampleCatNavHost(
 
             composable(Screen.Products.route) {
                 ProductsScreen(userViewModel = userViewModel)
+            }
+
+            composable(Screen.Paywalls.route) {
+                PaywallsScreen(userViewModel = userViewModel)
+            }
+
+            composable(Screen.CustomerCenter.route) {
+                CustomerCenterScreen()
             }
 
             composable(
