@@ -5,7 +5,6 @@ import com.revenuecat.purchases.LogLevel
 import com.revenuecat.purchases.Purchases
 import com.revenuecat.purchases.PurchasesConfiguration
 import com.revenuecat.samplecat.config.Constants
-import com.revenuecat.samplecat.BuildConfig
 
 /**
  * Application class that initializes the RevenueCat SDK.
@@ -20,7 +19,7 @@ class SampleCatApplication : Application() {
 
         // Configure the RevenueCat SDK
         Purchases.configure(
-            PurchasesConfiguration.Builder(this, Constants.apiKey).build()
+            PurchasesConfiguration.Builder(this, Constants.API_KEY).build()
         )
     }
 }

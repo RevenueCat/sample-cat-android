@@ -67,7 +67,7 @@ class UserViewModel : ViewModel() {
                 val info = Purchases.sharedInstance.awaitCustomerInfo()
                 _customerInfo.value = info
                 updateSubscriptionStatus(info)
-            } catch (e: PurchasesException) {
+            } catch (_: PurchasesException) {
                 // Initial fetch failed, will be updated via listener
             }
         }

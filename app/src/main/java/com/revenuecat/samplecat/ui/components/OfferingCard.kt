@@ -36,13 +36,16 @@ fun OfferingCard(
     val isDarkTheme = isSystemInDarkTheme()
     val cardBackground = if (isDarkTheme) Color.Black else Color.White
 
-    val packageCount = offering.availablePackages.size
-    val packageText = if (packageCount == 0) {
-        "No packages"
-    } else if (packageCount == 1) {
-        "1 package"
-    } else {
-        "$packageCount packages"
+    val packageText = when (val packageCount = offering.availablePackages.size) {
+        0 -> {
+            "No packages"
+        }
+        1 -> {
+            "1 package"
+        }
+        else -> {
+            "$packageCount packages"
+        }
     }
 
     Column(
