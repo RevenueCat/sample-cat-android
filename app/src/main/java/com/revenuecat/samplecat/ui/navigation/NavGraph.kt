@@ -128,7 +128,8 @@ fun SampleCatNavHost(
                 val offeringId = backStackEntry.arguments?.getString("offeringId") ?: ""
                 OfferingPackagesScreen(
                     userViewModel = userViewModel,
-                    offeringId = offeringId
+                    offeringId = offeringId,
+                    onBackClick = { navController.popBackStack() }
                 )
             }
         }
