@@ -9,11 +9,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -27,6 +27,8 @@ import com.revenuecat.samplecat.R
 import com.revenuecat.samplecat.ui.components.ConceptIntroduction
 import com.revenuecat.samplecat.ui.components.ContentBackground
 import com.revenuecat.samplecat.ui.components.OfferingCard
+import com.revenuecat.samplecat.ui.components.spinner.SpinnerContainer
+import com.revenuecat.samplecat.ui.components.spinner.SpinnerPullToRefreshIndicator
 import com.revenuecat.samplecat.ui.theme.RCGreen
 import com.revenuecat.samplecat.viewmodel.UserViewModel
 
@@ -51,12 +53,22 @@ fun OfferingsScreen(
         }
     }
 
+    val pullToRefreshState = rememberPullToRefreshState()
+
     Box(modifier = modifier.fillMaxSize()) {
         ContentBackground(color = RCGreen)
 
         PullToRefreshBox(
             isRefreshing = isFetching,
             onRefresh = { userViewModel.fetchOfferings() },
+            state = pullToRefreshState,
+            indicator = {
+                SpinnerPullToRefreshIndicator(
+                    state = pullToRefreshState,
+                    isRefreshing = isFetching,
+                    modifier = Modifier.align(Alignment.TopCenter)
+                )
+            },
             modifier = Modifier.fillMaxSize()
         ) {
             LazyColumn(
@@ -131,7 +143,7 @@ fun OfferingsScreen(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    CircularProgressIndicator()
+                    SpinnerContainer()
                 }
             }
         }

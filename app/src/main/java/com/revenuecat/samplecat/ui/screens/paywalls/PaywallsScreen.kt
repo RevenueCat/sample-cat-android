@@ -16,12 +16,12 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -40,6 +40,8 @@ import com.revenuecat.purchases.ui.revenuecatui.PaywallDialogOptions
 import com.revenuecat.samplecat.R
 import com.revenuecat.samplecat.ui.components.ConceptIntroduction
 import com.revenuecat.samplecat.ui.components.ContentBackground
+import com.revenuecat.samplecat.ui.components.spinner.SpinnerContainer
+import com.revenuecat.samplecat.ui.components.spinner.SpinnerPullToRefreshIndicator
 import com.revenuecat.samplecat.ui.theme.RCBlue
 import com.revenuecat.samplecat.viewmodel.UserViewModel
 
@@ -65,12 +67,22 @@ fun PaywallsScreen(
         }
     }
 
+    val pullToRefreshState = rememberPullToRefreshState()
+
     Box(modifier = modifier.fillMaxSize()) {
         ContentBackground(color = RCBlue)
 
         PullToRefreshBox(
             isRefreshing = isFetching,
             onRefresh = { userViewModel.fetchOfferings() },
+            state = pullToRefreshState,
+            indicator = {
+                SpinnerPullToRefreshIndicator(
+                    state = pullToRefreshState,
+                    isRefreshing = isFetching,
+                    modifier = Modifier.align(Alignment.TopCenter)
+                )
+            },
             modifier = Modifier.fillMaxSize()
         ) {
             LazyColumn(
@@ -142,7 +154,7 @@ fun PaywallsScreen(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    CircularProgressIndicator()
+                    SpinnerContainer()
                 }
             }
         }
