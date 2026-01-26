@@ -28,7 +28,7 @@ import com.revenuecat.samplecat.model.PurchasableState
 import com.revenuecat.samplecat.ui.components.ConceptIntroduction
 import com.revenuecat.samplecat.ui.components.ContentBackground
 import com.revenuecat.samplecat.ui.components.PurchasableCard
-import com.revenuecat.samplecat.ui.components.getActivity
+import com.revenuecat.samplecat.ui.utils.getActivity
 import com.revenuecat.samplecat.ui.components.spinner.SpinnerContainer
 import com.revenuecat.samplecat.ui.components.spinner.SpinnerPullToRefreshIndicator
 import com.revenuecat.samplecat.ui.theme.AccentColor

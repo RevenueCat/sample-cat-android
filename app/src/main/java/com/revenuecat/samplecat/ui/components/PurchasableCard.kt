@@ -1,6 +1,5 @@
 package com.revenuecat.samplecat.ui.components
 
-import android.app.Activity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
@@ -25,7 +24,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.revenuecat.samplecat.model.PurchasableState
@@ -124,13 +122,4 @@ fun PurchasableCard(
             )
         }
     }
-}
-
-/**
- * Helper function to get the current Activity from a Composable.
- */
-@Composable
-fun getActivity(): Activity? {
-    val context = LocalContext.current
-    return context as? Activity
 }
