@@ -29,7 +29,7 @@ import com.revenuecat.samplecat.model.PurchasableState
 import com.revenuecat.samplecat.ui.components.ConceptIntroduction
 import com.revenuecat.samplecat.ui.components.ContentBackground
 import com.revenuecat.samplecat.ui.components.PurchasableCard
-import com.revenuecat.samplecat.ui.utils.getActivity
+import androidx.activity.compose.LocalActivity
 import com.revenuecat.samplecat.ui.theme.RCGreen
 import com.revenuecat.samplecat.viewmodel.OfferingsUiState
 import com.revenuecat.samplecat.viewmodel.UserViewModel
@@ -58,7 +58,7 @@ fun OfferingPackagesScreen(
         derivedStateOf { offering?.availablePackages ?: emptyList() }
     }
 
-    val activity = getActivity()
+    val activity = LocalActivity.current
 
     Scaffold(
         topBar = {

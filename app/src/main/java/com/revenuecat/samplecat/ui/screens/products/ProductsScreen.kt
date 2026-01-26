@@ -26,7 +26,7 @@ import com.revenuecat.samplecat.ui.components.PurchasableCard
 import com.revenuecat.samplecat.ui.components.WarningMessageBox
 import com.revenuecat.samplecat.ui.components.spinner.SpinnerPullToRefreshIndicator
 import com.revenuecat.samplecat.ui.theme.AccentColor
-import com.revenuecat.samplecat.ui.utils.getActivity
+import androidx.activity.compose.LocalActivity
 import com.revenuecat.samplecat.viewmodel.OfferingsUiState
 import com.revenuecat.samplecat.viewmodel.UserViewModel
 
@@ -44,7 +44,7 @@ fun ProductsScreen(
     val purchasingProductId by userViewModel.purchasingProductId.collectAsState()
     val purchaseError by userViewModel.purchaseError.collectAsState()
 
-    val activity = getActivity()
+    val activity = LocalActivity.current
 
     val pullToRefreshState = rememberPullToRefreshState()
 
