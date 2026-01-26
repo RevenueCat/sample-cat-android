@@ -24,6 +24,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 /**
@@ -37,17 +38,14 @@ class UserViewModel : ViewModel() {
     private val _customerInfo = MutableStateFlow<CustomerInfo?>(null)
     val customerInfo: StateFlow<CustomerInfo?> = _customerInfo.asStateFlow()
 
-    private val _offerings = MutableStateFlow<Offerings?>(null)
-    val offerings: StateFlow<Offerings?> = _offerings
+    private val _offeringsState = MutableStateFlow<OfferingsUiState>(OfferingsUiState.Loading)
+    val offeringsState: StateFlow<OfferingsUiState> = _offeringsState
         .onStart { fetchOfferings() }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(STOPFLOW_TIMEOUT_MS),
-            initialValue = null
+            initialValue = OfferingsUiState.Loading
         )
-
-    private val _isFetchingOfferings = MutableStateFlow(false)
-    val isFetchingOfferings: StateFlow<Boolean> = _isFetchingOfferings.asStateFlow()
 
     private val _isPurchasing = MutableStateFlow(false)
     val isPurchasing: StateFlow<Boolean> = _isPurchasing.asStateFlow()
@@ -58,8 +56,8 @@ class UserViewModel : ViewModel() {
     private val _subscriptionActive = MutableStateFlow(false)
     val subscriptionActive: StateFlow<Boolean> = _subscriptionActive.asStateFlow()
 
-    private val _error = MutableStateFlow<String?>(null)
-    val error: StateFlow<String?> = _error.asStateFlow()
+    private val _purchaseError = MutableStateFlow<String?>(null)
+    val purchaseError: StateFlow<String?> = _purchaseError.asStateFlow()
 
     private val customerInfoListener = UpdatedCustomerInfoListener { customerInfo ->
         _customerInfo.value = customerInfo
@@ -98,14 +96,24 @@ class UserViewModel : ViewModel() {
      */
     fun fetchOfferings() {
         viewModelScope.launch {
-            _isFetchingOfferings.value = true
-            _error.value = null
+            val currentState = _offeringsState.value
+
+            // Set appropriate loading state based on whether we have existing data
+            when (currentState) {
+                is OfferingsUiState.Success -> {
+                    // We have data, this is a refresh - keep showing data with refreshing indicator
+                    _offeringsState.update { currentState.copy(isRefreshing = true, refreshError = null) }
+                }
+                else -> {
+                    // No data yet, show loading state
+                    _offeringsState.value = OfferingsUiState.Loading
+                }
+            }
 
             Log.d(TAG, "Fetching offerings...")
 
             try {
                 val fetchedOfferings = Purchases.sharedInstance.awaitOfferings()
-                _offerings.value = fetchedOfferings
 
                 Log.d(TAG, "Fetched offerings: ${fetchedOfferings.all.size} offerings")
                 fetchedOfferings.all.forEach { (id, offering) ->
@@ -115,11 +123,25 @@ class UserViewModel : ViewModel() {
                 if (fetchedOfferings.all.isEmpty()) {
                     Log.w(TAG, "No offerings returned from RevenueCat. Check your dashboard configuration.")
                 }
+
+                _offeringsState.value = OfferingsUiState.Success(offerings = fetchedOfferings)
             } catch (e: PurchasesException) {
                 Log.e(TAG, "Failed to fetch offerings: ${e.message}", e)
-                _error.value = "Failed to fetch offerings: ${e.message}"
-            } finally {
-                _isFetchingOfferings.value = false
+                val errorMessage = "Failed to fetch offerings: ${e.message}"
+
+                when (currentState) {
+                    is OfferingsUiState.Success -> {
+                        // Refresh failed, keep showing existing data with error
+                        _offeringsState.value = currentState.copy(
+                            isRefreshing = false,
+                            refreshError = errorMessage
+                        )
+                    }
+                    else -> {
+                        // Initial load failed
+                        _offeringsState.value = OfferingsUiState.Error(message = errorMessage)
+                    }
+                }
             }
         }
     }
@@ -141,7 +163,7 @@ class UserViewModel : ViewModel() {
         viewModelScope.launch {
             _isPurchasing.value = true
             _purchasingProductId.value = packageToPurchase.product.id
-            _error.value = null
+            _purchaseError.value = null
 
             try {
                 val purchaseParams = PurchaseParams.Builder(activity, packageToPurchase).build()
@@ -151,7 +173,7 @@ class UserViewModel : ViewModel() {
             } catch (e: PurchasesException) {
                 // User cancelled is not an error
                 if (e.error.code != PurchasesErrorCode.PurchaseCancelledError) {
-                    _error.value = "Purchase failed: ${e.message}"
+                    _purchaseError.value = "Purchase failed: ${e.message}"
                 }
             } finally {
                 _isPurchasing.value = false
@@ -172,7 +194,7 @@ class UserViewModel : ViewModel() {
         viewModelScope.launch {
             _isPurchasing.value = true
             _purchasingProductId.value = product.id
-            _error.value = null
+            _purchaseError.value = null
 
             try {
                 val purchaseParams = PurchaseParams.Builder(activity, product).build()
@@ -182,7 +204,7 @@ class UserViewModel : ViewModel() {
             } catch (e: PurchasesException) {
                 // User cancelled is not an error
                 if (e.error.code != PurchasesErrorCode.PurchaseCancelledError) {
-                    _error.value = "Purchase failed: ${e.message}"
+                    _purchaseError.value = "Purchase failed: ${e.message}"
                 }
             } finally {
                 _isPurchasing.value = false
@@ -206,24 +228,43 @@ class UserViewModel : ViewModel() {
      * Gets all offerings as a list.
      */
     fun getOfferingsList(): List<Offering> {
-        return _offerings.value?.all?.values?.toList() ?: emptyList()
+        val state = _offeringsState.value
+        return if (state is OfferingsUiState.Success) {
+            state.offerings.all.values.toList()
+        } else {
+            emptyList()
+        }
     }
 
     /**
      * Gets all unique products from all offerings.
      */
     fun getAllProducts(): List<StoreProduct> {
-        val offerings = _offerings.value ?: return emptyList()
-        return offerings.all.values
+        val state = _offeringsState.value
+        if (state !is OfferingsUiState.Success) return emptyList()
+        return state.offerings.all.values
             .flatMap { offering -> offering.availablePackages }
             .map { pkg -> pkg.product }
             .distinctBy { it.id }
     }
 
     /**
-     * Clears the current error.
+     * Clears the refresh error if in Success state.
      */
-    fun clearError() {
-        _error.value = null
+    fun clearRefreshError() {
+        _offeringsState.update { currentState ->
+            if (currentState is OfferingsUiState.Success) {
+                currentState.copy(refreshError = null)
+            } else {
+                currentState
+            }
+        }
+    }
+
+    /**
+     * Clears the purchase error.
+     */
+    fun clearPurchaseError() {
+        _purchaseError.value = null
     }
 }

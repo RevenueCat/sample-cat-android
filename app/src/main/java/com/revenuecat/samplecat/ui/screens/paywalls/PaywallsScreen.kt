@@ -43,6 +43,7 @@ import com.revenuecat.samplecat.ui.components.ContentBackground
 import com.revenuecat.samplecat.ui.components.spinner.SpinnerContainer
 import com.revenuecat.samplecat.ui.components.spinner.SpinnerPullToRefreshIndicator
 import com.revenuecat.samplecat.ui.theme.RCBlue
+import com.revenuecat.samplecat.viewmodel.OfferingsUiState
 import com.revenuecat.samplecat.viewmodel.UserViewModel
 
 /**
@@ -54,25 +55,27 @@ fun PaywallsScreen(
     userViewModel: UserViewModel,
     modifier: Modifier = Modifier
 ) {
-    val offerings by userViewModel.offerings.collectAsState()
-    val isFetching by userViewModel.isFetchingOfferings.collectAsState()
-    val error by userViewModel.error.collectAsState()
+    val offeringsState by userViewModel.offeringsState.collectAsState()
 
     var selectedOffering by remember { mutableStateOf<Offering?>(null) }
 
     val pullToRefreshState = rememberPullToRefreshState()
 
+    // Derive values from sealed state
+    val isRefreshing = (offeringsState as? OfferingsUiState.Success)?.isRefreshing == true
+    val isLoading = offeringsState is OfferingsUiState.Loading
+
     Box(modifier = modifier.fillMaxSize()) {
         ContentBackground(color = RCBlue)
 
         PullToRefreshBox(
-            isRefreshing = isFetching,
+            isRefreshing = isRefreshing,
             onRefresh = { userViewModel.fetchOfferings() },
             state = pullToRefreshState,
             indicator = {
                 SpinnerPullToRefreshIndicator(
                     state = pullToRefreshState,
-                    isRefreshing = isFetching,
+                    isRefreshing = isRefreshing,
                     modifier = Modifier.align(Alignment.TopCenter)
                 )
             },
@@ -90,59 +93,86 @@ fun PaywallsScreen(
                     )
                 }
 
-                // Show error if present
-                error?.let { errorMessage ->
-                    item {
-                        Box(
-                            modifier = Modifier
-                                .padding(horizontal = 16.dp, vertical = 8.dp)
-                                .fillMaxWidth()
-                                .clip(RoundedCornerShape(8.dp))
-                                .background(Color(0xFFFFCDD2))
-                                .padding(16.dp)
-                        ) {
-                            Text(
-                                text = errorMessage,
-                                color = Color(0xFFB71C1C),
-                                style = MaterialTheme.typography.bodyMedium
+                when (val state = offeringsState) {
+                    is OfferingsUiState.Loading -> {
+                        // Loading state handled by overlay below
+                    }
+
+                    is OfferingsUiState.Error -> {
+                        item {
+                            Box(
+                                modifier = Modifier
+                                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                                    .fillMaxWidth()
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .background(Color(0xFFFFCDD2))
+                                    .padding(16.dp)
+                            ) {
+                                Text(
+                                    text = state.message,
+                                    color = Color(0xFFB71C1C),
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                            }
+                        }
+                    }
+
+                    is OfferingsUiState.Success -> {
+                        // Show refresh error if present
+                        state.refreshError?.let { errorMessage ->
+                            item {
+                                Box(
+                                    modifier = Modifier
+                                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                                        .fillMaxWidth()
+                                        .clip(RoundedCornerShape(8.dp))
+                                        .background(Color(0xFFFFCDD2))
+                                        .padding(16.dp)
+                                ) {
+                                    Text(
+                                        text = errorMessage,
+                                        color = Color(0xFFB71C1C),
+                                        style = MaterialTheme.typography.bodyMedium
+                                    )
+                                }
+                            }
+                        }
+
+                        val offeringsList = state.offerings.all.values.toList()
+
+                        // Show empty state if no offerings
+                        if (offeringsList.isEmpty()) {
+                            item {
+                                Box(
+                                    modifier = Modifier
+                                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                                        .fillMaxWidth()
+                                        .clip(RoundedCornerShape(8.dp))
+                                        .background(Color(0xFFFFF3E0))
+                                        .padding(16.dp)
+                                ) {
+                                    Text(
+                                        text = stringResource(R.string.paywalls_empty),
+                                        color = Color(0xFFE65100),
+                                        style = MaterialTheme.typography.bodyMedium
+                                    )
+                                }
+                            }
+                        }
+
+                        items(offeringsList, key = { it.identifier }) { offering ->
+                            PaywallOfferingCard(
+                                offering = offering,
+                                onClick = { selectedOffering = offering },
+                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
                             )
                         }
                     }
-                }
-
-                val offeringsList = userViewModel.getOfferingsList()
-
-                // Show empty state if no offerings and not loading
-                if (offeringsList.isEmpty() && !isFetching && error == null) {
-                    item {
-                        Box(
-                            modifier = Modifier
-                                .padding(horizontal = 16.dp, vertical = 8.dp)
-                                .fillMaxWidth()
-                                .clip(RoundedCornerShape(8.dp))
-                                .background(Color(0xFFFFF3E0))
-                                .padding(16.dp)
-                        ) {
-                            Text(
-                                text = stringResource(R.string.paywalls_empty),
-                                color = Color(0xFFE65100),
-                                style = MaterialTheme.typography.bodyMedium
-                            )
-                        }
-                    }
-                }
-
-                items(offeringsList, key = { it.identifier }) { offering ->
-                    PaywallOfferingCard(
-                        offering = offering,
-                        onClick = { selectedOffering = offering },
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
-                    )
                 }
             }
 
-            // Loading overlay
-            if (isFetching && offerings == null) {
+            // Loading overlay for initial load
+            if (isLoading) {
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center

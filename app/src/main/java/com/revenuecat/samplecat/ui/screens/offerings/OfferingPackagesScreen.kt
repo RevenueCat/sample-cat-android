@@ -31,6 +31,7 @@ import com.revenuecat.samplecat.ui.components.ContentBackground
 import com.revenuecat.samplecat.ui.components.PurchasableCard
 import com.revenuecat.samplecat.ui.utils.getActivity
 import com.revenuecat.samplecat.ui.theme.RCGreen
+import com.revenuecat.samplecat.viewmodel.OfferingsUiState
 import com.revenuecat.samplecat.viewmodel.UserViewModel
 
 /**
@@ -44,12 +45,14 @@ fun OfferingPackagesScreen(
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val offerings by userViewModel.offerings.collectAsState()
+    val offeringsState by userViewModel.offeringsState.collectAsState()
     val isPurchasing by userViewModel.isPurchasing.collectAsState()
     val purchasingProductId by userViewModel.purchasingProductId.collectAsState()
 
     val offering by remember {
-        derivedStateOf { offerings?.all?.get(offeringId) }
+        derivedStateOf {
+            (offeringsState as? OfferingsUiState.Success)?.offerings?.all?.get(offeringId)
+        }
     }
     val packages by remember {
         derivedStateOf { offering?.availablePackages ?: emptyList() }
