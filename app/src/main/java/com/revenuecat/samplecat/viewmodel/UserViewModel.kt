@@ -17,7 +17,9 @@ import com.revenuecat.purchases.awaitOfferings
 import com.revenuecat.purchases.awaitPurchase
 import com.revenuecat.purchases.interfaces.UpdatedCustomerInfoListener
 import com.revenuecat.purchases.models.StoreProduct
+import com.revenuecat.samplecat.R
 import com.revenuecat.samplecat.config.Constants
+import com.revenuecat.samplecat.model.LocalizedMessage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -56,8 +58,8 @@ class UserViewModel : ViewModel() {
     private val _subscriptionActive = MutableStateFlow(false)
     val subscriptionActive: StateFlow<Boolean> = _subscriptionActive.asStateFlow()
 
-    private val _purchaseError = MutableStateFlow<String?>(null)
-    val purchaseError: StateFlow<String?> = _purchaseError.asStateFlow()
+    private val _purchaseError = MutableStateFlow<LocalizedMessage?>(null)
+    val purchaseError: StateFlow<LocalizedMessage?> = _purchaseError.asStateFlow()
 
     private val customerInfoListener = UpdatedCustomerInfoListener { customerInfo ->
         _customerInfo.value = customerInfo
@@ -127,19 +129,22 @@ class UserViewModel : ViewModel() {
                 _offeringsState.value = OfferingsUiState.Success(offerings = fetchedOfferings)
             } catch (e: PurchasesException) {
                 Log.e(TAG, "Failed to fetch offerings: ${e.message}", e)
-                val errorMessage = "Failed to fetch offerings: ${e.message}"
+                val localizedError = LocalizedMessage(
+                    resId = R.string.error_fetch_offerings,
+                    formatArgs = listOf(e.message ?: "")
+                )
 
                 when (currentState) {
                     is OfferingsUiState.Success -> {
                         // Refresh failed, keep showing existing data with error
                         _offeringsState.value = currentState.copy(
                             isRefreshing = false,
-                            refreshError = errorMessage
+                            refreshError = localizedError
                         )
                     }
                     else -> {
                         // Initial load failed
-                        _offeringsState.value = OfferingsUiState.Error(message = errorMessage)
+                        _offeringsState.value = OfferingsUiState.Error(error = localizedError)
                     }
                 }
             }
@@ -173,7 +178,10 @@ class UserViewModel : ViewModel() {
             } catch (e: PurchasesException) {
                 // User cancelled is not an error
                 if (e.error.code != PurchasesErrorCode.PurchaseCancelledError) {
-                    _purchaseError.value = "Purchase failed: ${e.message}"
+                    _purchaseError.value = LocalizedMessage(
+                        resId = R.string.error_purchase_failed,
+                        formatArgs = listOf(e.message ?: "")
+                    )
                 }
             } finally {
                 _isPurchasing.value = false
@@ -204,7 +212,10 @@ class UserViewModel : ViewModel() {
             } catch (e: PurchasesException) {
                 // User cancelled is not an error
                 if (e.error.code != PurchasesErrorCode.PurchaseCancelledError) {
-                    _purchaseError.value = "Purchase failed: ${e.message}"
+                    _purchaseError.value = LocalizedMessage(
+                        resId = R.string.error_purchase_failed,
+                        formatArgs = listOf(e.message ?: "")
+                    )
                 }
             } finally {
                 _isPurchasing.value = false

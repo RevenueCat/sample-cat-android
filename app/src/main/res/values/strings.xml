@@ -44,6 +44,10 @@
     <string name="customer_center_description">Help your customers manage their subscriptions with a self-service Customer Center.</string>
     <string name="customer_center_open">Open Customer Center</string>
 
+    <!-- Error messages -->
+    <string name="error_fetch_offerings">Failed to fetch offerings: %1$s</string>
+    <string name="error_purchase_failed">Purchase failed: %1$s</string>
+
     <!-- Preview strings -->
     <string name="preview_subscription_title">Monthly Subscription</string>
     <string name="preview_subscription_price">$4.99/month</string>

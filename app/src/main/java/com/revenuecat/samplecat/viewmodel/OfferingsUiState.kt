@@ -1,6 +1,7 @@
 package com.revenuecat.samplecat.viewmodel
 
 import com.revenuecat.purchases.Offerings
+import com.revenuecat.samplecat.model.LocalizedMessage
 
 /**
  * Represents the UI state for offerings fetching.
@@ -21,18 +22,18 @@ sealed interface OfferingsUiState {
      *
      * @param offerings The loaded offerings data
      * @param isRefreshing True if a refresh is in progress (pull-to-refresh)
-     * @param refreshError Error message if a refresh failed (keeps showing existing data)
+     * @param refreshError Localized error message if a refresh failed (keeps showing existing data)
      */
     data class Success(
         val offerings: Offerings,
         val isRefreshing: Boolean = false,
-        val refreshError: String? = null
+        val refreshError: LocalizedMessage? = null
     ) : OfferingsUiState
 
     /**
      * Initial load failed with no data to show.
      *
-     * @param message The error message describing what went wrong
+     * @param error The localized error message describing what went wrong
      */
-    data class Error(val message: String) : OfferingsUiState
+    data class Error(val error: LocalizedMessage) : OfferingsUiState
 }

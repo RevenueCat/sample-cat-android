@@ -81,10 +81,13 @@ fun ProductsScreen(
                 }
 
                 // Show purchase error if present
-                purchaseError?.let { errorMessage ->
+                purchaseError?.let { error ->
                     item {
                         ErrorMessageBox(
-                            message = errorMessage,
+                            message = stringResource(
+                                error.resId,
+                                *error.formatArgs.toTypedArray()
+                            ),
                             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
                         )
                     }
@@ -98,7 +101,10 @@ fun ProductsScreen(
                     is OfferingsUiState.Error -> {
                         item {
                             ErrorMessageBox(
-                                message = state.message,
+                                message = stringResource(
+                                    state.error.resId,
+                                    *state.error.formatArgs.toTypedArray()
+                                ),
                                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
                             )
                         }
@@ -106,10 +112,13 @@ fun ProductsScreen(
 
                     is OfferingsUiState.Success -> {
                         // Show refresh error if present
-                        state.refreshError?.let { errorMessage ->
+                        state.refreshError?.let { error ->
                             item {
                                 ErrorMessageBox(
-                                    message = errorMessage,
+                                    message = stringResource(
+                                        error.resId,
+                                        *error.formatArgs.toTypedArray()
+                                    ),
                                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
                                 )
                             }
