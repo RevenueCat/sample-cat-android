@@ -15,7 +15,7 @@ It is built with Jetpack Compose and Material 3.
 | Property | Required | Description |
 |----------|----------|-------------|
 | `REVENUECAT_API_KEY` | Yes | Google Play API key from RevenueCat dashboard |
-| `APPLICATION_ID` | Yes | Package name matching your Play Console app |
+| `PACKAGE_NAME` | Yes | Package name matching your Play Console app |
 | `REVENUECAT_ENTITLEMENT_ID` | No | Entitlement identifier for subscription status |
 
 Open `gradle.properties` and set your values:
@@ -25,7 +25,7 @@ Open `gradle.properties` and set your values:
 REVENUECAT_API_KEY=goog_xxxxxxxxxxxxx
 
 # Required: Your app's package name (must match Play Console)
-APPLICATION_ID=com.yourcompany.yourapp
+PACKAGE_NAME=com.yourcompany.yourapp
 
 # Optional: Entitlement ID to check subscription status
 REVENUECAT_ENTITLEMENT_ID=premium

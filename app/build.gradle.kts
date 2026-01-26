@@ -40,17 +40,17 @@ val entitlementId: String? = (project.findProperty("REVENUECAT_ENTITLEMENT_ID") 
         """.trimMargin()
     )}
 
-val applicationIdProperty: String = (project.findProperty("APPLICATION_ID") as? String)
+val applicationIdProperty: String = (project.findProperty("PACKAGE_NAME") as? String)
     ?.takeIf { it.isNotBlank() && it != "must-inject" }
     ?: throw GradleException(
         """
         |
-        |Application ID not configured!
+        |Package name not configured!
         |
         |To configure the application ID:
         |1. Open gradle.properties in the project root
-        |2. Set your application ID (package name):
-        |   APPLICATION_ID=com.example.yourapp
+        |2. Set your package name (application id):
+        |   PACKAGE_NAME=com.example.yourapp
         |
         |This must match the package name in Google Play Console.
         |
