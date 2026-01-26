@@ -48,6 +48,14 @@
     <string name="error_fetch_offerings">Failed to fetch offerings: %1$s</string>
     <string name="error_purchase_failed">Purchase failed: %1$s</string>
 
+    <!-- Web Purchase Redemption -->
+    <string name="redemption_success">Purchase redeemed successfully!</string>
+    <string name="redemption_error">Redemption failed: %1$s</string>
+    <string name="redemption_invalid_token">This redemption link is invalid.</string>
+    <string name="redemption_belongs_to_other_user">This purchase belongs to a different user and cannot be redeemed.</string>
+    <string name="redemption_expired">This redemption link has expired. A new one has been sent to %1$s.</string>
+    <string name="redemption_in_progress">Redeeming purchase…</string>
+
     <!-- Preview strings -->
     <string name="preview_subscription_title">Monthly Subscription</string>
     <string name="preview_subscription_price">$4.99/month</string>
