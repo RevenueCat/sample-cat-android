@@ -1,7 +1,3 @@
-# RevenueCat SDK - keep necessary classes
--keep class com.revenuecat.purchases.** { *; }
--keep class com.android.vending.billing.** { *; }
-
 # Keep Kotlin coroutines
 -keepnames class kotlinx.coroutines.internal.MainDispatcherFactory {}
 -keepnames class kotlinx.coroutines.CoroutineExceptionHandler {}
