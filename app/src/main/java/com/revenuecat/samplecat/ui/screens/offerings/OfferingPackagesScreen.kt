@@ -17,7 +17,9 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -46,8 +48,12 @@ fun OfferingPackagesScreen(
     val isPurchasing by userViewModel.isPurchasing.collectAsState()
     val purchasingProductId by userViewModel.purchasingProductId.collectAsState()
 
-    val offering = offerings?.all?.get(offeringId)
-    val packages = offering?.availablePackages ?: emptyList()
+    val offering by remember {
+        derivedStateOf { offerings?.all?.get(offeringId) }
+    }
+    val packages by remember {
+        derivedStateOf { offering?.availablePackages ?: emptyList() }
+    }
 
     val activity = getActivity()
 
