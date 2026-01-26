@@ -8,16 +8,17 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.drawscope.Fill
-import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.drawscope.rotate
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
+import com.revenuecat.samplecat.R
 import com.revenuecat.samplecat.ui.theme.AccentColor
 
 /**
@@ -53,19 +54,21 @@ fun Spinner(
         label = "yarnAngle"
     )
 
-    Canvas(modifier = modifier.size(40.dp)) {
-        val canvasSize = Size(size.width, size.height)
+    val ballPainter = rememberVectorPainter(ImageVector.vectorResource(R.drawable.ic_yarn_ball))
+    val yarnPainter = rememberVectorPainter(ImageVector.vectorResource(R.drawable.ic_yarn_string))
 
+    Canvas(modifier = modifier.size(40.dp)) {
         // Draw yarn with oscillating rotation (pivot at trailing edge)
         rotate(
             degrees = yarnAngle,
             pivot = center.copy(x = size.width)
         ) {
-            drawPath(
-                path = yarnPath(canvasSize),
-                color = tint,
-                style = Stroke(width = 2.dp.toPx())
-            )
+            with(yarnPainter) {
+                draw(
+                    size = size,
+                    colorFilter = ColorFilter.tint(tint)
+                )
+            }
         }
 
         // Draw ball with continuous rotation (pivot at center)
@@ -73,11 +76,12 @@ fun Spinner(
             degrees = ballRotation,
             pivot = center.copy(y = center.y * 1.02f) // Slight offset like iOS (0.51)
         ) {
-            drawPath(
-                path = ballPath(canvasSize),
-                color = tint,
-                style = Fill
-            )
+            with(ballPainter) {
+                draw(
+                    size = size,
+                    colorFilter = ColorFilter.tint(tint)
+                )
+            }
         }
     }
 }
