@@ -17,9 +17,11 @@ import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.revenuecat.samplecat.R
 import com.revenuecat.samplecat.ui.theme.AccentColor
+import com.revenuecat.samplecat.ui.theme.SampleCatTheme
 
 /**
  * A custom loading spinner that displays an animated yarn ball.
@@ -83,5 +85,13 @@ fun Spinner(
                 )
             }
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun SpinnerPreview() {
+    SampleCatTheme {
+        Spinner()
     }
 }

@@ -16,7 +16,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.revenuecat.samplecat.R
+import com.revenuecat.samplecat.ui.theme.SampleCatTheme
 
 /**
  * A hero component displaying an image, title, and description.
@@ -64,5 +67,18 @@ fun ConceptIntroduction(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Preview(showBackground = true, uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun ConceptIntroductionPreview() {
+    SampleCatTheme {
+        ConceptIntroduction(
+            imageRes = R.drawable.visual_offerings,
+            title = "Offerings",
+            description = "Offerings are the selection of products that are offered to a given user."
+        )
     }
 }

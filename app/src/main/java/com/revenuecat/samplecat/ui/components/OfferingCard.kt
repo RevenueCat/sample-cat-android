@@ -18,8 +18,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.revenuecat.purchases.Offering
+import com.revenuecat.samplecat.ui.theme.SampleCatTheme
 
 /**
  * A card component for displaying an offering in the offerings list.
@@ -33,19 +35,28 @@ fun OfferingCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    OfferingCardContent(
+        identifier = offering.identifier,
+        packageCount = offering.availablePackages.size,
+        onClick = onClick,
+        modifier = modifier
+    )
+}
+
+@Composable
+private fun OfferingCardContent(
+    identifier: String,
+    packageCount: Int,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     val isDarkTheme = isSystemInDarkTheme()
     val cardBackground = if (isDarkTheme) Color.Black else Color.White
 
-    val packageText = when (val packageCount = offering.availablePackages.size) {
-        0 -> {
-            "No packages"
-        }
-        1 -> {
-            "1 package"
-        }
-        else -> {
-            "$packageCount packages"
-        }
+    val packageText = when (packageCount) {
+        0 -> "No packages"
+        1 -> "1 package"
+        else -> "$packageCount packages"
     }
 
     Column(
@@ -61,7 +72,7 @@ fun OfferingCard(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = offering.identifier,
+                text = identifier,
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
                 modifier = Modifier.weight(1f)
@@ -74,6 +85,43 @@ fun OfferingCard(
             text = packageText,
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Preview(showBackground = true, uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun OfferingCardPreview() {
+    SampleCatTheme {
+        OfferingCardContent(
+            identifier = "default",
+            packageCount = 3,
+            onClick = {}
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun OfferingCardSinglePackagePreview() {
+    SampleCatTheme {
+        OfferingCardContent(
+            identifier = "premium",
+            packageCount = 1,
+            onClick = {}
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun OfferingCardNoPackagesPreview() {
+    SampleCatTheme {
+        OfferingCardContent(
+            identifier = "empty_offering",
+            packageCount = 0,
+            onClick = {}
         )
     }
 }

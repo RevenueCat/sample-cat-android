@@ -9,6 +9,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshState
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -19,8 +20,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.revenuecat.samplecat.ui.theme.AccentColor
+import com.revenuecat.samplecat.ui.theme.SampleCatTheme
 
 /**
  * A custom pull-to-refresh indicator using the yarn ball Spinner.
@@ -65,6 +68,18 @@ fun SpinnerPullToRefreshIndicator(
             modifier = Modifier
                 .padding(12.dp)
                 .size(40.dp)
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview(showBackground = true)
+@Composable
+private fun SpinnerPullToRefreshIndicatorPreview() {
+    SampleCatTheme {
+        SpinnerPullToRefreshIndicator(
+            state = rememberPullToRefreshState(),
+            isRefreshing = true
         )
     }
 }

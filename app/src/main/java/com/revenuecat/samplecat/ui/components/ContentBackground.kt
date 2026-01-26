@@ -13,7 +13,10 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ShaderBrush
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.tooling.preview.Preview
 import com.revenuecat.samplecat.R
+import com.revenuecat.samplecat.ui.theme.AccentColor
+import com.revenuecat.samplecat.ui.theme.SampleCatTheme
 
 /**
  * A background component with a gradient overlay and tiled noise pattern.
@@ -68,5 +71,14 @@ fun ContentBackground(
                     )
                 )
         )
+    }
+}
+
+@Preview(showBackground = true, widthDp = 300, heightDp = 400)
+@Preview(showBackground = true, widthDp = 300, heightDp = 400, uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun ContentBackgroundPreview() {
+    SampleCatTheme {
+        ContentBackground(color = AccentColor)
     }
 }

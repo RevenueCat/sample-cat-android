@@ -25,9 +25,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.revenuecat.samplecat.model.PurchasableState
 import com.revenuecat.samplecat.ui.theme.AccentColor
+import com.revenuecat.samplecat.ui.theme.SampleCatTheme
 
 /**
  * A card component for displaying and purchasing a product or package.
@@ -121,5 +123,48 @@ fun PurchasableCard(
                 fontWeight = FontWeight.SemiBold
             )
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Preview(showBackground = true, uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun PurchasableCardReadyPreview() {
+    SampleCatTheme {
+        PurchasableCard(
+            title = "Monthly Subscription",
+            productId = "com.example.monthly",
+            description = "$4.99/month",
+            state = PurchasableState.ReadyToPurchase,
+            onPurchaseClick = {}
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun PurchasableCardPurchasingPreview() {
+    SampleCatTheme {
+        PurchasableCard(
+            title = "Monthly Subscription",
+            productId = "com.example.monthly",
+            description = "$4.99/month",
+            state = PurchasableState.Purchasing,
+            onPurchaseClick = {}
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun PurchasableCardPurchasedPreview() {
+    SampleCatTheme {
+        PurchasableCard(
+            title = "Monthly Subscription",
+            productId = "com.example.monthly",
+            description = "$4.99/month",
+            state = PurchasableState.Purchased,
+            onPurchaseClick = {}
+        )
     }
 }
