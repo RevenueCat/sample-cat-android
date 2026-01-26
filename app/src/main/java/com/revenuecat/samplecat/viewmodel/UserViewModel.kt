@@ -19,8 +19,11 @@ import com.revenuecat.purchases.interfaces.UpdatedCustomerInfoListener
 import com.revenuecat.purchases.models.StoreProduct
 import com.revenuecat.samplecat.config.Constants
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 /**
@@ -35,7 +38,13 @@ class UserViewModel : ViewModel() {
     val customerInfo: StateFlow<CustomerInfo?> = _customerInfo.asStateFlow()
 
     private val _offerings = MutableStateFlow<Offerings?>(null)
-    val offerings: StateFlow<Offerings?> = _offerings.asStateFlow()
+    val offerings: StateFlow<Offerings?> = _offerings
+        .onStart { fetchOfferings() }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(STOPFLOW_TIMEOUT_MS),
+            initialValue = null
+        )
 
     private val _isFetchingOfferings = MutableStateFlow(false)
     val isFetchingOfferings: StateFlow<Boolean> = _isFetchingOfferings.asStateFlow()
@@ -117,6 +126,7 @@ class UserViewModel : ViewModel() {
 
     companion object {
         private const val TAG = "UserViewModel"
+        private const val STOPFLOW_TIMEOUT_MS = 5_000L
     }
 
     /**

@@ -15,7 +15,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -46,13 +45,6 @@ fun OfferingsScreen(
     val offerings by userViewModel.offerings.collectAsState()
     val isFetching by userViewModel.isFetchingOfferings.collectAsState()
     val error by userViewModel.error.collectAsState()
-
-    // Fetch offerings on first load
-    LaunchedEffect(Unit) {
-        if (offerings == null) {
-            userViewModel.fetchOfferings()
-        }
-    }
 
     val pullToRefreshState = rememberPullToRefreshState()
 
