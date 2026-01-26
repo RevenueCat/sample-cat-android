@@ -20,6 +20,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.revenuecat.samplecat.R
 import com.revenuecat.samplecat.model.PurchasableState
@@ -53,12 +54,12 @@ fun OfferingPackagesScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(offering?.identifier ?: "Packages") },
+                title = { Text(offering?.identifier ?: stringResource(R.string.nav_packages)) },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
+                            contentDescription = stringResource(R.string.nav_back)
                         )
                     }
                 },
@@ -82,8 +83,8 @@ fun OfferingPackagesScreen(
                 item {
                     ConceptIntroduction(
                         imageRes = R.drawable.visual_offerings,
-                        title = "Packages",
-                        description = "Packages are a representation of the products that you \"offer\" to customers on your paywall."
+                        title = stringResource(R.string.packages_title),
+                        description = stringResource(R.string.packages_description)
                     )
                 }
 

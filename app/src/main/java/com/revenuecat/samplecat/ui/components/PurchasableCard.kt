@@ -24,9 +24,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.revenuecat.samplecat.R
 import com.revenuecat.samplecat.model.PurchasableState
 import com.revenuecat.samplecat.ui.theme.AccentColor
 import com.revenuecat.samplecat.ui.theme.SampleCatTheme
@@ -54,9 +56,9 @@ fun PurchasableCard(
 
     val buttonText = when (state) {
         PurchasableState.ReadyToPurchase,
-        PurchasableState.PurchasingOtherProduct -> "Purchase"
-        PurchasableState.Purchasing -> "Purchasing..."
-        PurchasableState.Purchased -> "Purchased"
+        PurchasableState.PurchasingOtherProduct -> stringResource(R.string.purchase_button)
+        PurchasableState.Purchasing -> stringResource(R.string.purchase_button_purchasing)
+        PurchasableState.Purchased -> stringResource(R.string.purchase_button_purchased)
     }
 
     val isEnabled = state == PurchasableState.ReadyToPurchase
@@ -132,9 +134,9 @@ fun PurchasableCard(
 private fun PurchasableCardReadyPreview() {
     SampleCatTheme {
         PurchasableCard(
-            title = "Monthly Subscription",
-            productId = "com.example.monthly",
-            description = "$4.99/month",
+            title = stringResource(R.string.preview_subscription_title),
+            productId = stringResource(R.string.preview_product_id),
+            description = stringResource(R.string.preview_subscription_price),
             state = PurchasableState.ReadyToPurchase,
             onPurchaseClick = {}
         )
@@ -146,9 +148,9 @@ private fun PurchasableCardReadyPreview() {
 private fun PurchasableCardPurchasingPreview() {
     SampleCatTheme {
         PurchasableCard(
-            title = "Monthly Subscription",
-            productId = "com.example.monthly",
-            description = "$4.99/month",
+            title = stringResource(R.string.preview_subscription_title),
+            productId = stringResource(R.string.preview_product_id),
+            description = stringResource(R.string.preview_subscription_price),
             state = PurchasableState.Purchasing,
             onPurchaseClick = {}
         )
@@ -160,9 +162,9 @@ private fun PurchasableCardPurchasingPreview() {
 private fun PurchasableCardPurchasedPreview() {
     SampleCatTheme {
         PurchasableCard(
-            title = "Monthly Subscription",
-            productId = "com.example.monthly",
-            description = "$4.99/month",
+            title = stringResource(R.string.preview_subscription_title),
+            productId = stringResource(R.string.preview_product_id),
+            description = stringResource(R.string.preview_subscription_price),
             state = PurchasableState.Purchased,
             onPurchaseClick = {}
         )

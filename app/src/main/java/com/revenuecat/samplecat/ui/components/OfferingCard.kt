@@ -17,10 +17,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.revenuecat.purchases.Offering
+import com.revenuecat.samplecat.R
 import com.revenuecat.samplecat.ui.theme.SampleCatTheme
 
 /**
@@ -54,9 +56,9 @@ private fun OfferingCardContent(
     val cardBackground = if (isDarkTheme) Color.Black else Color.White
 
     val packageText = when (packageCount) {
-        0 -> "No packages"
-        1 -> "1 package"
-        else -> "$packageCount packages"
+        0 -> stringResource(R.string.package_count_zero)
+        1 -> stringResource(R.string.package_count_one)
+        else -> stringResource(R.string.package_count_other, packageCount)
     }
 
     Column(

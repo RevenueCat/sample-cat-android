@@ -26,6 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
@@ -54,8 +55,8 @@ fun CustomerCenterScreen(
             item {
                 ConceptIntroduction(
                     imageRes = R.drawable.visual_customer_center,
-                    title = "Customer Center",
-                    description = "Help your customers manage their subscriptions with a self-service Customer Center."
+                    title = stringResource(R.string.customer_center_title),
+                    description = stringResource(R.string.customer_center_description)
                 )
             }
 
@@ -100,7 +101,7 @@ private fun CustomerCenterButton(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = "Open Customer Center",
+            text = stringResource(R.string.customer_center_open),
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.weight(1f)
         )

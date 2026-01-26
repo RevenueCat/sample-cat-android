@@ -33,6 +33,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.revenuecat.purchases.Offering
 import com.revenuecat.purchases.ui.revenuecatui.PaywallDialog
@@ -92,8 +93,8 @@ fun PaywallsScreen(
                 item {
                     ConceptIntroduction(
                         imageRes = R.drawable.visual_paywalls,
-                        title = "Paywalls",
-                        description = "Display beautiful, customizable paywalls to showcase your offerings and drive conversions."
+                        title = stringResource(R.string.paywalls_title),
+                        description = stringResource(R.string.paywalls_description)
                     )
                 }
 
@@ -131,7 +132,7 @@ fun PaywallsScreen(
                                 .padding(16.dp)
                         ) {
                             Text(
-                                text = "No offerings found. Make sure you have configured offerings in your RevenueCat dashboard.",
+                                text = stringResource(R.string.paywalls_empty),
                                 color = Color(0xFFE65100),
                                 style = MaterialTheme.typography.bodyMedium
                             )
@@ -194,8 +195,14 @@ private fun PaywallOfferingCard(
                 text = offering.identifier,
                 style = MaterialTheme.typography.titleMedium
             )
+            val packageCount = offering.availablePackages.size
+            val packageText = when (packageCount) {
+                0 -> stringResource(R.string.package_count_zero)
+                1 -> stringResource(R.string.package_count_one)
+                else -> stringResource(R.string.package_count_other, packageCount)
+            }
             Text(
-                text = "${offering.availablePackages.size} package${if (offering.availablePackages.size != 1) "s" else ""}",
+                text = packageText,
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

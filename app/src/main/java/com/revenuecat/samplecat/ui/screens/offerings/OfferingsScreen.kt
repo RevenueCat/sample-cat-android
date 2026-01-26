@@ -22,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.revenuecat.samplecat.R
 import com.revenuecat.samplecat.ui.components.ConceptIntroduction
@@ -78,8 +79,8 @@ fun OfferingsScreen(
                 item {
                     ConceptIntroduction(
                         imageRes = R.drawable.visual_offerings,
-                        title = "Offerings",
-                        description = "Offerings are the products you can \"offer\" to customers on your paywall."
+                        title = stringResource(R.string.offerings_title),
+                        description = stringResource(R.string.offerings_description)
                     )
                 }
 
@@ -117,7 +118,7 @@ fun OfferingsScreen(
                                 .padding(16.dp)
                         ) {
                             Text(
-                                text = "No offerings found. Make sure you have configured offerings in your RevenueCat dashboard and they are linked to products in the Play Store.",
+                                text = stringResource(R.string.offerings_empty),
                                 color = Color(0xFFE65100),
                                 style = MaterialTheme.typography.bodyMedium
                             )

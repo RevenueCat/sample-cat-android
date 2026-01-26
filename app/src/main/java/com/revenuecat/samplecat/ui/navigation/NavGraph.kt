@@ -1,5 +1,6 @@
 package com.revenuecat.samplecat.ui.navigation
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CreditCard
@@ -15,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavType
@@ -23,6 +25,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.revenuecat.samplecat.R
 import com.revenuecat.samplecat.ui.screens.customercenter.CustomerCenterScreen
 import com.revenuecat.samplecat.ui.screens.offerings.OfferingPackagesScreen
 import com.revenuecat.samplecat.ui.screens.offerings.OfferingsScreen
@@ -33,14 +36,14 @@ import com.revenuecat.samplecat.viewmodel.UserViewModel
 /**
  * Sealed class representing the navigation routes.
  */
-sealed class Screen(val route: String, val title: String, val icon: ImageVector?) {
-    data object Offerings : Screen("offerings", "Offerings", Icons.Default.Payments)
-    data object Products : Screen("products", "Products", Icons.Default.Inventory2)
-    data object Paywalls : Screen("paywalls", "Paywalls", Icons.Default.CreditCard)
-    data object CustomerCenter : Screen("customer_center", "Support", Icons.Default.ManageAccounts)
+sealed class Screen(val route: String, @StringRes val titleRes: Int, val icon: ImageVector?) {
+    data object Offerings : Screen("offerings", R.string.nav_offerings, Icons.Default.Payments)
+    data object Products : Screen("products", R.string.nav_products, Icons.Default.Inventory2)
+    data object Paywalls : Screen("paywalls", R.string.nav_paywalls, Icons.Default.CreditCard)
+    data object CustomerCenter : Screen("customer_center", R.string.nav_support, Icons.Default.ManageAccounts)
     data object OfferingPackages : Screen(
         route = "offering_packages/{offeringId}",
-        title = "Packages",
+        titleRes = R.string.nav_packages,
         icon = null
     ) {
         fun createRoute(offeringId: String) = "offering_packages/$offeringId"
@@ -71,11 +74,12 @@ fun SampleCatNavHost(
             if (showBottomBar) {
                 NavigationBar {
                     bottomNavItems.forEach { screen ->
+                        val title = stringResource(screen.titleRes)
                         NavigationBarItem(
                             icon = {
-                                screen.icon?.let { Icon(it, contentDescription = screen.title) }
+                                screen.icon?.let { Icon(it, contentDescription = title) }
                             },
-                            label = { Text(screen.title) },
+                            label = { Text(title) },
                             selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
                             onClick = {
                                 navController.navigate(screen.route) {

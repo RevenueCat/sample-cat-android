@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -77,8 +78,8 @@ private fun ConceptIntroductionPreview() {
     SampleCatTheme {
         ConceptIntroduction(
             imageRes = R.drawable.visual_offerings,
-            title = "Offerings",
-            description = "Offerings are the selection of products that are offered to a given user."
+            title = stringResource(R.string.offerings_title),
+            description = stringResource(R.string.offerings_description)
         )
     }
 }

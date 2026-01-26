@@ -22,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.revenuecat.samplecat.R
 import com.revenuecat.samplecat.model.PurchasableState
@@ -83,8 +84,8 @@ fun ProductsScreen(
                 item {
                     ConceptIntroduction(
                         imageRes = R.drawable.visual_products,
-                        title = "Products",
-                        description = "Products are the individual in-app purchases and subscriptions you set up on the Play Store."
+                        title = stringResource(R.string.products_title),
+                        description = stringResource(R.string.products_description)
                     )
                 }
 
@@ -122,7 +123,7 @@ fun ProductsScreen(
                                 .padding(16.dp)
                         ) {
                             Text(
-                                text = "No products found. Make sure your offerings have packages with products configured in the Play Store.",
+                                text = stringResource(R.string.products_empty),
                                 color = Color(0xFFE65100),
                                 style = MaterialTheme.typography.bodyMedium
                             )
