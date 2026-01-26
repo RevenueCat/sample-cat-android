@@ -1,25 +1,12 @@
 package com.revenuecat.samplecat.ui.screens.paywalls
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
@@ -30,8 +17,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.revenuecat.purchases.Offering
@@ -40,7 +25,10 @@ import com.revenuecat.purchases.ui.revenuecatui.PaywallDialogOptions
 import com.revenuecat.samplecat.R
 import com.revenuecat.samplecat.ui.components.ConceptIntroduction
 import com.revenuecat.samplecat.ui.components.ContentBackground
-import com.revenuecat.samplecat.ui.components.spinner.SpinnerContainer
+import com.revenuecat.samplecat.ui.components.ErrorMessageBox
+import com.revenuecat.samplecat.ui.components.LoadingOverlay
+import com.revenuecat.samplecat.ui.components.NavigationRowCard
+import com.revenuecat.samplecat.ui.components.WarningMessageBox
 import com.revenuecat.samplecat.ui.components.spinner.SpinnerPullToRefreshIndicator
 import com.revenuecat.samplecat.ui.theme.RCBlue
 import com.revenuecat.samplecat.viewmodel.OfferingsUiState
@@ -100,20 +88,10 @@ fun PaywallsScreen(
 
                     is OfferingsUiState.Error -> {
                         item {
-                            Box(
-                                modifier = Modifier
-                                    .padding(horizontal = 16.dp, vertical = 8.dp)
-                                    .fillMaxWidth()
-                                    .clip(RoundedCornerShape(8.dp))
-                                    .background(Color(0xFFFFCDD2))
-                                    .padding(16.dp)
-                            ) {
-                                Text(
-                                    text = state.message,
-                                    color = Color(0xFFB71C1C),
-                                    style = MaterialTheme.typography.bodyMedium
-                                )
-                            }
+                            ErrorMessageBox(
+                                message = state.message,
+                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                            )
                         }
                     }
 
@@ -121,20 +99,10 @@ fun PaywallsScreen(
                         // Show refresh error if present
                         state.refreshError?.let { errorMessage ->
                             item {
-                                Box(
-                                    modifier = Modifier
-                                        .padding(horizontal = 16.dp, vertical = 8.dp)
-                                        .fillMaxWidth()
-                                        .clip(RoundedCornerShape(8.dp))
-                                        .background(Color(0xFFFFCDD2))
-                                        .padding(16.dp)
-                                ) {
-                                    Text(
-                                        text = errorMessage,
-                                        color = Color(0xFFB71C1C),
-                                        style = MaterialTheme.typography.bodyMedium
-                                    )
-                                }
+                                ErrorMessageBox(
+                                    message = errorMessage,
+                                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                                )
                             }
                         }
 
@@ -143,26 +111,23 @@ fun PaywallsScreen(
                         // Show empty state if no offerings
                         if (offeringsList.isEmpty()) {
                             item {
-                                Box(
-                                    modifier = Modifier
-                                        .padding(horizontal = 16.dp, vertical = 8.dp)
-                                        .fillMaxWidth()
-                                        .clip(RoundedCornerShape(8.dp))
-                                        .background(Color(0xFFFFF3E0))
-                                        .padding(16.dp)
-                                ) {
-                                    Text(
-                                        text = stringResource(R.string.paywalls_empty),
-                                        color = Color(0xFFE65100),
-                                        style = MaterialTheme.typography.bodyMedium
-                                    )
-                                }
+                                WarningMessageBox(
+                                    message = stringResource(R.string.paywalls_empty),
+                                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                                )
                             }
                         }
 
                         items(offeringsList, key = { it.identifier }) { offering ->
-                            PaywallOfferingCard(
-                                offering = offering,
+                            val packageCount = offering.availablePackages.size
+                            val packageText = when (packageCount) {
+                                0 -> stringResource(R.string.package_count_zero)
+                                1 -> stringResource(R.string.package_count_one)
+                                else -> stringResource(R.string.package_count_other, packageCount)
+                            }
+                            NavigationRowCard(
+                                title = offering.identifier,
+                                subtitle = packageText,
                                 onClick = { selectedOffering = offering },
                                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
                             )
@@ -173,12 +138,7 @@ fun PaywallsScreen(
 
             // Loading overlay for initial load
             if (isLoading) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    SpinnerContainer()
-                }
+                LoadingOverlay()
             }
         }
     }
@@ -190,50 +150,6 @@ fun PaywallsScreen(
                 .setOffering(offering)
                 .setDismissRequest { selectedOffering = null }
                 .build()
-        )
-    }
-}
-
-@Composable
-private fun PaywallOfferingCard(
-    offering: Offering,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    val isDarkTheme = isSystemInDarkTheme()
-    val backgroundColor = if (isDarkTheme) Color.Black else Color.White
-
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp))
-            .background(backgroundColor)
-            .clickable(onClick = onClick)
-            .padding(16.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = offering.identifier,
-                style = MaterialTheme.typography.titleMedium
-            )
-            val packageCount = offering.availablePackages.size
-            val packageText = when (packageCount) {
-                0 -> stringResource(R.string.package_count_zero)
-                1 -> stringResource(R.string.package_count_one)
-                else -> stringResource(R.string.package_count_other, packageCount)
-            }
-            Text(
-                text = packageText,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
-        Spacer(modifier = Modifier.padding(8.dp))
-        Icon(
-            imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }
 }

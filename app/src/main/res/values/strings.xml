@@ -48,4 +48,8 @@
     <string name="preview_subscription_title">Monthly Subscription</string>
     <string name="preview_subscription_price">$4.99/month</string>
     <string name="preview_product_id">com.example.monthly</string>
+    <string name="preview_error_message">An error occurred while loading data.</string>
+    <string name="preview_warning_message">No items found. Please try again later.</string>
+    <string name="preview_offering_title">Default Offering</string>
+    <string name="preview_package_count">3 packages</string>
 </resources>
