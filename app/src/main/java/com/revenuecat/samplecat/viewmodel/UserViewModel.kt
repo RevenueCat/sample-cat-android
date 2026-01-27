@@ -1,7 +1,6 @@
 package com.revenuecat.samplecat.viewmodel
 
 import android.app.Activity
-import android.content.Intent
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -16,8 +15,6 @@ import com.revenuecat.purchases.PurchasesException
 import com.revenuecat.purchases.awaitCustomerInfo
 import com.revenuecat.purchases.awaitOfferings
 import com.revenuecat.purchases.awaitPurchase
-import com.revenuecat.purchases.asWebPurchaseRedemption
-import com.revenuecat.purchases.interfaces.RedeemWebPurchaseListener
 import com.revenuecat.purchases.interfaces.UpdatedCustomerInfoListener
 import com.revenuecat.purchases.models.StoreProduct
 import com.revenuecat.samplecat.R
@@ -63,9 +60,6 @@ class UserViewModel : ViewModel() {
 
     private val _purchaseError = MutableStateFlow<LocalizedMessage?>(null)
     val purchaseError: StateFlow<LocalizedMessage?> = _purchaseError.asStateFlow()
-
-    private val _redemptionState = MutableStateFlow<RedemptionState>(RedemptionState.Idle)
-    val redemptionState: StateFlow<RedemptionState> = _redemptionState.asStateFlow()
 
     private val customerInfoListener = UpdatedCustomerInfoListener { customerInfo ->
         _customerInfo.value = customerInfo
@@ -284,86 +278,4 @@ class UserViewModel : ViewModel() {
     fun clearPurchaseError() {
         _purchaseError.value = null
     }
-
-    /**
-     * Handles web purchase redemption from an intent.
-     *
-     * @param intent The intent that may contain a web purchase redemption
-     */
-    fun handleWebPurchaseRedemption(intent: Intent) {
-        val webPurchaseRedemption = intent.asWebPurchaseRedemption() ?: return
-
-        Log.d(TAG, "Web purchase redemption detected, starting redemption...")
-        _redemptionState.value = RedemptionState.Redeeming
-
-        Purchases.sharedInstance.redeemWebPurchase(webPurchaseRedemption) { result ->
-            when (result) {
-                is RedeemWebPurchaseListener.Result.Success -> {
-                    Log.d(TAG, "Web purchase redeemed successfully")
-                    _customerInfo.value = result.customerInfo
-                    updateSubscriptionStatus(result.customerInfo)
-                    _redemptionState.value = RedemptionState.Success(
-                        message = LocalizedMessage(resId = R.string.redemption_success)
-                    )
-                }
-                is RedeemWebPurchaseListener.Result.Error -> {
-                    Log.e(TAG, "Web purchase redemption failed: ${result.error.message}")
-                    _redemptionState.value = RedemptionState.Error(
-                        message = LocalizedMessage(
-                            resId = R.string.redemption_error,
-                            formatArgs = listOf(result.error.message ?: "")
-                        )
-                    )
-                }
-                RedeemWebPurchaseListener.Result.InvalidToken -> {
-                    Log.e(TAG, "Web purchase redemption failed: Invalid token")
-                    _redemptionState.value = RedemptionState.Error(
-                        message = LocalizedMessage(resId = R.string.redemption_invalid_token)
-                    )
-                }
-                RedeemWebPurchaseListener.Result.PurchaseBelongsToOtherUser -> {
-                    Log.e(TAG, "Web purchase redemption failed: Belongs to other user")
-                    _redemptionState.value = RedemptionState.Error(
-                        message = LocalizedMessage(resId = R.string.redemption_belongs_to_other_user)
-                    )
-                }
-                is RedeemWebPurchaseListener.Result.Expired -> {
-                    Log.w(TAG, "Web purchase redemption expired, new link sent to: ${result.obfuscatedEmail}")
-                    _redemptionState.value = RedemptionState.Expired(
-                        message = LocalizedMessage(
-                            resId = R.string.redemption_expired,
-                            formatArgs = listOf(result.obfuscatedEmail)
-                        )
-                    )
-                }
-            }
-        }
-    }
-
-    /**
-     * Clears the redemption state back to idle.
-     */
-    fun clearRedemptionState() {
-        _redemptionState.value = RedemptionState.Idle
-    }
-}
-
-/**
- * Represents the state of a web purchase redemption operation.
- */
-sealed interface RedemptionState {
-    /** No redemption in progress. */
-    data object Idle : RedemptionState
-
-    /** Redemption is currently in progress. */
-    data object Redeeming : RedemptionState
-
-    /** Redemption completed successfully. */
-    data class Success(val message: LocalizedMessage) : RedemptionState
-
-    /** Redemption failed with an error. */
-    data class Error(val message: LocalizedMessage) : RedemptionState
-
-    /** Redemption link expired, new one sent to user. */
-    data class Expired(val message: LocalizedMessage) : RedemptionState
 }
